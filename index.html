@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz – Statistiques avancées du manager</title>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--tx:#1b2250;--mu:#5b6b7f;--pr:#0b5a80;--ac:#f4a642;--ok:#1f8a4c;--okb:#e3f5ea;--ko:#b3372f;--kob:#fbe9e7;--bd:#d5dde8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a3a;--card:#1f2857;--tx:#eef1fb;--mu:#a9b6cc;--pr:#5fb6e0;--ok:#66d08f;--okb:#17372a;--ko:#ff8f85;--kob:#3f1f24;--bd:#39447a}}
+:root[data-theme="dark"]{--bg:#141a3a;--card:#1f2857;--tx:#eef1fb;--mu:#a9b6cc;--pr:#5fb6e0;--ok:#66d08f;--okb:#17372a;--ko:#ff8f85;--kob:#3f1f24;--bd:#39447a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+h1{font:700 26px/1.2 Cambria,Georgia,serif;margin:8px 0 4px}
+.sub{color:var(--mu);margin:0 0 16px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tabs button{flex:1;padding:12px 8px;border:2px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:600 15px inherit;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--pr);border-color:var(--pr);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px}
+.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0 16px}
+.bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--mu);font-size:14px}
+.ctx{background:var(--bg);border-left:4px solid var(--ac);padding:10px 12px;border-radius:6px;margin:0 0 12px;font-size:15px}
+h2{font:600 19px/1.35 Cambria,Georgia,serif;margin:0 0 14px}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;margin:8px 0;border:2px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--pr)}
+.opt:focus-visible,.tabs button:focus-visible,.go:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.opt.ok{background:var(--okb);border-color:var(--ok)}
+.opt.ko{background:var(--kob);border-color:var(--ko)}
+.opt:disabled{cursor:default}
+.fb{margin-top:12px;padding:12px;border-radius:10px;font-size:15px}
+.fb.ok{background:var(--okb)}.fb.ko{background:var(--kob)}
+.go{margin-top:14px;padding:12px 22px;border:0;border-radius:10px;background:var(--pr);color:#fff;font:600 16px inherit;cursor:pointer}
+.big{font:700 44px Cambria,Georgia,serif;margin:6px 0}
+</style></head><body><main>
+<h1>Statistiques avancées pour le manager</h1>
+<p class="sub">Testez-vous sur le vocabulaire, puis sur le choix du bon prompt.</p>
+<div class="tabs" role="tablist"><button role="tab" id="t0" aria-selected="true">Quiz 1 · Comprendre les termes</button><button role="tab" id="t1" aria-selected="false">Quiz 2 · Choisir le bon prompt</button></div>
+<div class="card" id="box"></div>
+</main>
+<script>
+// [question, bonne réponse, faux 1, faux 2, explication]
+const Q1=[
+["Pourquoi préférer la médiane à la moyenne pour analyser des salaires ?","Elle résiste aux valeurs extrêmes","Elle est toujours plus grande que la moyenne","Elle est plus simple à calculer","Quelques très hauts salaires tirent la moyenne vers le haut ; la médiane (valeur qui coupe l’effectif en deux) reste stable."],
+["Que mesure l’écart-type ?","La dispersion des valeurs autour de la moyenne","La valeur la plus fréquente","La valeur centrale de la série","Plus il est grand, plus les données sont étalées."],
+["Que sont les quartiles ?","Trois valeurs qui découpent les données ordonnées en 4 parts de 25 %","Les 4 plus grandes valeurs","Les moyennes de 4 sous-groupes","Q1, médiane (Q2) et Q3 ; l’écart Q3–Q1 (IQR) sert à repérer les anomalies."],
+["Skewness et kurtosis décrivent…","L’asymétrie et l’épaisseur des queues d’une distribution","La moyenne et la médiane","La taille de l’échantillon et sa variance","Skewness = asymétrie ; kurtosis = poids des valeurs extrêmes dans les queues."],
+["La probabilité conditionnelle P(A|B) est…","La probabilité de A sachant que B est réalisé","La probabilité que A ou B arrive","La probabilité que A et B soient indépendants","Essentielle pour le risque et le scoring : la probabilité change selon l’information connue."],
+["Le théorème de Bayes sert à…","Mettre à jour une probabilité avec une nouvelle information","Calculer une moyenne pondérée","Tester la normalité des données","Il relie P(A|B) à P(B|A)."],
+["L’espérance d’une variable aléatoire est…","Sa valeur moyenne pondérée par les probabilités","Sa valeur la plus probable","Son écart maximal","C’est la moyenne « à long terme »."],
+["Quelle distribution modélise le nombre d’événements rares dans une période (pannes par mois) ?","Poisson","Normale","Log-normale","Poisson = comptage d’événements ; normale = cloche symétrique ; log-normale = valeurs positives asymétriques (revenus, montants)."],
+["Que dit le théorème central limite ?","La moyenne d’échantillons suffisamment grands suit approximativement une loi normale","Toutes les variables sont normales","Un grand échantillon supprime le biais de sélection","Il justifie les intervalles de confiance et les tests même si les données ne sont pas normales."],
+["Qu’est-ce qu’un échantillonnage stratifié ?","Un tirage réalisé dans chaque sous-groupe de la population","Un tirage de volontaires","Un tirage sans aucune règle","Il garantit que chaque strate (département, région…) est représentée."],
+["Biais et variance : quelle est la différence ?","Le biais est une erreur systématique, la variance une dispersion aléatoire","Le biais est aléatoire, la variance systématique","Ce sont deux mots pour la même chose","Un échantillon plus grand réduit la variance mais ne corrige pas un biais de sélection."],
+["Un intervalle de confiance à 95 % signifie…","Une plage plausible pour la vraie valeur, issue d’une méthode fiable 95 % du temps","95 % des données sont dans l’intervalle","H0 a 95 % de chances d’être vraie","Il exprime l’incertitude de l’estimation."],
+["L’erreur standard mesure…","La précision d’une estimation","La dispersion des individus","Les erreurs de saisie","Elle diminue quand la taille de l’échantillon augmente."],
+["Le bootstrap consiste à…","Rééchantillonner avec remise pour estimer l’incertitude","Supprimer les valeurs extrêmes","Diviser les données en train et test","Utile quand la formule théorique de l’erreur est inconnue."],
+["Dans un test, H0 et H1 sont…","H0 = pas d’effet ; H1 = un effet existe","H0 = effet existe ; H1 = pas d’effet","Deux échantillons","On cherche des preuves contre H0."],
+["Que signifie une p-value de 0,03 ?","Un résultat aussi extrême serait rare (3 %) si H0 était vraie","H0 a 3 % de chances d’être vraie","L’effet est faible de 3 %","La p-value ne dit rien sur la taille de l’effet ni sur la probabilité que H0 soit vraie."],
+["Erreur de type I et de type II ?","I : rejeter H0 alors qu’elle est vraie ; II : ne pas la rejeter alors qu’elle est fausse","I : faux négatif ; II : faux positif","Ce sont des erreurs de calcul","Type I = fausse alerte ; type II = effet réel manqué."],
+["Quel test compare les moyennes de deux groupes ?","Le t-test","Le Chi²","La régression logistique","Pour 3 groupes ou plus, on utilise l’ANOVA."],
+["Le Chi² teste…","Le lien entre deux variables catégorielles","La différence de deux moyennes","La corrélation linéaire","Ex. : département et départ (oui/non)."],
+["Pearson et Spearman : quelle différence ?","Pearson mesure un lien linéaire ; Spearman un lien monotone basé sur les rangs","Pearson est pour les rangs, Spearman pour le linéaire","Ils mesurent la causalité","La covariance, elle, indique si deux variables varient ensemble, sans être normalisée."],
+["Que rappelle « corrélation n’est pas causalité » ?","Deux variables liées ne prouvent pas que l’une cause l’autre","Une corrélation faible prouve l’absence de lien","Une corrélation forte prouve la cause","Un facteur tiers ou le hasard peut expliquer le lien."],
+["Que représente le R² d’une régression ?","La part de variance de la variable expliquée par le modèle","La probabilité que le modèle soit vrai","Le nombre de variables","R² = 0,70 : 70 % de la variance est expliquée."],
+["À quoi sert le VIF ?","Détecter la multicolinéarité entre variables explicatives","Mesurer la taille de l’effet","Prévoir la saisonnalité","Un VIF élevé rend les coefficients instables."],
+["Que sont les résidus ?","Les écarts entre valeurs observées et valeurs prédites","Les valeurs manquantes","Les coefficients du modèle","Leur examen vérifie linéarité et hypothèses du modèle."],
+["Kruskal-Wallis est…","L’alternative non paramétrique à l’ANOVA","Un test de stationnarité","Un modèle de survie","Il compare plusieurs groupes sans supposer la normalité."],
+["Pourquoi calculer une taille d’effet (Cohen’s d, odds ratio) ?","Savoir combien l’effet pèse, au-delà de la p-value","Remplacer l’intervalle de confiance","Vérifier la normalité","Un effet significatif peut être négligeable en pratique."],
+["Séries temporelles : tendance et saisonnalité ?","Tendance = évolution de fond ; saisonnalité = motif périodique répété","Tendance = motif périodique ; saisonnalité = évolution de fond","Deux noms de l’aléa","Ex. : CA en hausse (tendance) avec pic chaque décembre (saison)."],
+["Qu’est-ce que la stationnarité ?","Moyenne et variance stables dans le temps","Une série sans aucune valeur","Une série toujours croissante","Condition de base de nombreux modèles, dont ARIMA."],
+["ARIMA et Holt-Winters sont…","Des méthodes de prévision de séries temporelles","Des tests d’hypothèses","Des mesures de dispersion","Holt-Winters : lissage tendance + saison ; ARIMA : autocorrélation."],
+["Un rolling forecast est…","Une prévision glissante, remise à jour régulièrement","Un budget figé en début d’année","Un test de significativité","Il s’applique au CA, aux coûts, à la trésorerie et au BFR."],
+["Que décompose l’analyse de variance en contrôle de gestion ?","L’écart budget/réalisé en effets prix, volume et mix","Les résidus d’une régression","La variance d’un échantillon","Le bridge (waterfall) présente ces effets étape par étape."],
+["Que fait une simulation Monte Carlo ?","Simule des milliers de scénarios pour obtenir une distribution de résultats","Calcule une moyenne unique","Supprime les anomalies","Ex. : probabilité que le budget dépasse 500 M FCFA."],
+["Value at Risk (VaR) et stress test ?","VaR = perte seuil à un niveau de probabilité ; stress test = scénario extrême","VaR = gain moyen ; stress test = audit","Deux mesures de corrélation","La VaR donne le seuil au-delà duquel intervenir."],
+["En régression logistique, le seuil et la matrice de confusion servent à…","Décider à partir de quelle probabilité on prédit « départ » et compter vrais/faux positifs et négatifs","Mesurer la multicolinéarité","Prévoir la saisonnalité","Un odds ratio > 1 signifie que le facteur augmente les odds."],
+["Précision et rappel ?","Précision : parmi les alertes, combien sont justes ; rappel : parmi les vrais cas, combien détectés","Précision : vrais cas détectés ; rappel : alertes justes","Deux noms du R²","Le F1-score est leur moyenne harmonique."],
+["ROC-AUC et calibration ?","AUC : capacité à discriminer ; calibration : fiabilité des probabilités prédites","AUC : erreur de prévision ; calibration : biais","Deux tests de normalité","Un modèle peut bien classer mais donner des probabilités fausses."],
+["Que fournit l’analyse de survie (Kaplan-Meier, Cox) ?","La probabilité de « survivre » (rester) dans le temps et l’effet des facteurs (hazard ratio)","Une classification oui/non","Un test de normalité","Répond à « combien de temps avant le départ ? »."],
+["Ridge et Lasso sont…","Des régressions régularisées qui limitent le sur-apprentissage","Des tests de survie","Des méthodes de clustering","Lasso peut aussi éliminer des variables."],
+["Random Forest, XGBoost, réseaux de neurones ?","Des modèles prédictifs flexibles de classification/régression","Des tests d’hypothèses","Des indicateurs de risque","Puissants, mais à valider soigneusement."],
+["Train/test split, k-fold, data leakage ?","Valider sur des données non vues ; le leakage fausse cette validation en « fuyant » l’information du test","Trois types de variables","Trois indicateurs de survie","Le leakage donne des performances trop belles."],
+["Overfitting vs underfitting ?","Sur-apprentissage (trop collé aux données) vs sous-apprentissage (trop simple)","Deux types de biais de sélection","Deux tests de stationnarité","C’est le compromis biais/variance."],
+["Quelles métriques évaluent une prévision ?","RMSE, MAE, MAPE","Accuracy, F1, AUC","Odds ratio, hazard ratio","Accuracy, F1 et AUC servent à la classification."],
+["Le A/B testing sert à…","Comparer deux versions avec assignation aléatoire pour mesurer un effet causal","Segmenter des clients","Prévoir une série temporelle","On teste significativité et taille d’effet."],
+["Difference-in-Differences, Propensity Score Matching, variables instrumentales ?","Des méthodes d’analyse causale quand on ne peut pas randomiser","Des tests de normalité","Des méthodes de prévision","Elles cherchent à isoler l’effet réel d’une action."],
+["Dans l’approche bayésienne, prior → likelihood → posterior signifie…","Croyance initiale + données = croyance mise à jour","Données + p-value = décision","Échantillon + biais = erreur","Le posterior est la croyance actualisée."],
+["PCA, clustering (k-means), analyse discriminante ?","Des méthodes multivariées pour réduire, segmenter ou classer","Des tests de significativité","Des mesures de risque","Ex. : segmenter employés, clients ou risques."],
+["La loi de Benford examine…","La fréquence des premiers chiffres des montants","La moyenne des montants","La saisonnalité","Un écart marqué peut signaler des écritures manipulées."],
+["Z-score, IQR, Isolation Forest ?","Des méthodes de détection d’anomalies","Des méthodes de prévision","Des tests de causalité","Le z-score compte les écarts-types ; l’IQR utilise les quartiles."],
+["La winsorization consiste à…","Plafonner les valeurs extrêmes plutôt que les laisser fausser l’analyse","Supprimer la moitié des données","Ajouter des données","C’est une statistique robuste, comme la médiane."],
+["L’élasticité prix-demande est…","Variation % des ventes / variation % du prix","Écart-type des prix","Corrélation prix-coût","Elle identifie les segments où une baisse de prix est rentable."],
+["À quoi sert une analyse de sensibilité ?","Mesurer l’impact d’une variation (±5 % à ±20 %) des hypothèses","Tester la normalité","Calculer un odds ratio","Elle montre quelles hypothèses pèsent le plus."],
+["Intervalle de confiance vs intervalle prédictif ?","Le 1er encadre la valeur moyenne estimée ; le 2nd encadre une future observation (plus large)","Ils sont identiques","Le 1er concerne la causalité","À demander à l’IA avec l’erreur standard."]
+];
+// [contexte, bon prompt, prompt vague, prompt inadapté, explication]
+const Q2=[
+["RH — Vous voulez comprendre pourquoi vos collaborateurs à forte performance partent et quand le risque devient critique.","Audite la qualité des données, décris cible et explicatives, construis une régression logistique (odds ratios, IC 95 %), contrôle le VIF, puis une analyse de survie Kaplan-Meier/Cox ; valide par ROC-AUC, F1 et matrice de confusion.","Analyse les départs des employés.","Fais une moyenne du turnover par département et dis-moi si c’est bien.","Le bon prompt impose la méthode (logistique + survie), les diagnostics et la validation. Le turnover moyen masque les profils à risque."],
+["Finance — Votre trésorerie tiendra-t-elle les 6 prochains mois ?","Décompose tendance/saisonnalité (Holt-Winters, ARIMA), fais un rolling forecast du BFR et du cash-flow, simule par Monte Carlo la distribution des soldes et donne la VaR et P(solde < 0).","Prévois ma trésorerie.","Calcule la corrélation de Pearson entre encaissements et décaissements.","On veut une fourchette avec probabilités, pas un chiffre unique : séries temporelles + Monte Carlo + VaR."],
+["Contrôle de gestion — Le CA est +8 % au-dessus du budget. D’où vient l’écart ?","Décompose l’écart en effets prix, volume et mix, présente un bridge budget vs réalisé, teste s’il est significatif ou du bruit, et fais une sensibilité de ±5 % à ±20 %.","Explique pourquoi le CA a augmenté.","Fais un test de Chi² entre produit et mois.","Une hausse de CA peut cacher une baisse de marge (volume à prix cassés). La décomposition prix/volume/mix identifie le levier."],
+["Audit — Vous devez repérer des écritures suspectes dans des milliers de lignes.","Applique la loi de Benford aux premiers chiffres, détecte les anomalies par z-score, IQR et Isolation Forest, utilise des statistiques robustes (médiane, winsorization) et propose un échantillonnage statistique de substance.","Cherche les erreurs dans ma comptabilité.","Prévois les écritures du mois prochain avec ARIMA.","Objectif : cibler les 2 à 5 % de transactions vraiment atypiques, avec justification statistique documentée."],
+["Droit & conformité — Votre politique salariale résisterait-elle à un contentieux sur l’égalité de rémunération ?","Fais une régression salariale ajustée (poste, ancienneté, performance, diplôme), teste le coefficient du facteur sensible (p-value, IC 95 %), calcule le Cohen’s d et distingue corrélation et causalité.","Compare les salaires des hommes et des femmes.","Calcule la moyenne des salaires et conclus s’il y a discrimination.","Un écart brut peut disparaître ou se confirmer une fois ajusté ; l’écart ajusté et documenté protège l’entreprise."],
+["Marketing — Faut-il baisser le prix ou changer de mix produit ?","Estime l’élasticité prix-demande, teste en A/B avec significativité et taille d’effet, segmente les clients par k-means et PCA, et isole l’effet marketing de la saisonnalité par régression.","Dis-moi si baisser le prix est une bonne idée.","Calcule la médiane des ventes mensuelles.","Évite d’attribuer à la campagne une hausse due à la saisonnalité, et cible les segments à élasticité favorable."],
+["Direction générale — Peut-on valider cet investissement dont le ROI moyen estimé est de 12 % ?","Donne le ROI avec son intervalle de confiance, la taille d’effet économique, un scénario/sensibilité sur les hypothèses clés et un tableau de bord KPI avec l’incertitude affichée.","Le projet est-il rentable ? Réponds oui ou non.","Donne uniquement le ROI moyen, sans détails.","« 80 % de chances d’être entre 8 % et 16 % » permet d’arbitrer le risque ; « 12 % » seul est fragile."],
+["Causalité — La formation lancée en janvier a-t-elle vraiment fait monter les ventes ?","Estime l’effet causal par Difference-in-Differences ou Propensity Score Matching, en distinguant association et causalité, avec IC 95 % et tests de robustesse.","Montre-moi que la formation a fonctionné.","Calcule la corrélation entre formation et ventes et conclus que la formation est la cause.","Pour répondre à « est-ce cette action qui a produit le résultat ? », il faut une méthode causale."],
+["Data Science — Vous construisez un modèle de prédiction de départs avant de le présenter en comité.","Compare Ridge/Lasso, Random Forest et XGBoost avec train/test et k-fold, évite le data leakage, vérifie l’overfitting et rapporte ROC-AUC, F1, précision, rappel et calibration.","Fais-moi le modèle le plus précis possible.","Entraîne sur toutes les données et donne l’accuracy sur ces mêmes données.","Un modèle se valide sur des données non vues, avec plusieurs métriques et le compromis biais/variance."],
+["Prévision — Vous devez communiquer une prévision de ventes à votre comité.","Donne l’estimation + l’intervalle de confiance + l’erreur standard + l’intervalle prédictif, et distingue clairement association et causalité.","Donne-moi la prévision de ventes.","Donne-moi la valeur exacte des ventes de l’an prochain.","Toujours demander l’incertitude, pas seulement l’estimation : c’est la logique de la chaîne question → décision."]
+];
+const sets=[{d:Q1,n:"Quiz 1"},{d:Q2,n:"Quiz 2"}];
+const box=document.getElementById("box");
+let cur=0,S=[{i:0,s:0},{i:0,s:0}];
+const sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+const esc=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function render(){
+  const st=S[cur],D=sets[cur].d;
+  if(st.i>=D.length){
+    const p=Math.round(100*st.s/D.length);
+    box.innerHTML=`<div class="meta"><span>${sets[cur].n} terminé</span></div><div class="big">${st.s} / ${D.length}</div><p>${p>=85?"Excellent : vous parlez le langage du statisticien.":p>=60?"Bon niveau : revoyez les notions ratées pour consolider.":"Bon début : relisez le document puis recommencez."}</p><button class="go" id="re">Recommencer</button>`;
+    document.getElementById("re").onclick=()=>{S[cur]={i:0,s:0};render()};return;
+  }
+  const q=D[st.i],o=sh([[q[1],1],[q[2],0],[q[3],0]]);
+  box.innerHTML=`<div class="meta"><span>Question ${st.i+1} / ${D.length}</span><span>Score : ${st.s}</span></div><div class="bar"><i style="width:${100*st.i/D.length}%"></i></div>${cur?`<p class="ctx">${esc(q[0])}</p><h2>Quel prompt choisir ?</h2>`:`<h2>${esc(q[0])}</h2>`}<div id="o">${o.map((x,k)=>`<button class="opt" data-k="${k}">${esc(x[0])}</button>`).join("")}</div><div id="f"></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const r=o[b.dataset.k][1];if(r)st.s++;
+    box.querySelectorAll(".opt").forEach((e,k)=>{e.disabled=true;if(o[k][1])e.classList.add("ok");else if(e===b)e.classList.add("ko")});
+    document.getElementById("f").innerHTML=`<div class="fb ${r?"ok":"ko"}"><b>${r?"Bonne réponse.":"Pas tout à fait."}</b> ${esc(q[4])}</div><button class="go" id="nx">${st.i+1<D.length?"Question suivante":"Voir mon score"}</button>`;
+    const n=document.getElementById("nx");n.onclick=()=>{st.i++;render()};n.focus();
+  });
+}
+[0,1].forEach(k=>document.getElementById("t"+k).onclick=()=>{cur=k;[0,1].forEach(j=>document.getElementById("t"+j).setAttribute("aria-selected",j===k));render()});
+render();
+</script></body></html>
